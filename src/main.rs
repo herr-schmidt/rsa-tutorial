@@ -7,12 +7,12 @@ use rand::SeedableRng;
 
 fn main() {
     let mut generator = rand::rngs::StdRng::seed_from_u64(553246);
-    let mut p = BigInt::zero();
-    let mut q = BigInt::zero();
-    let mut n = BigInt::zero();
-    let mut phi_n = BigInt::zero();
+    let mut p: BigInt;
+    let mut q: BigInt;
+    let mut n: BigInt;
+    let mut phi_n: BigInt;
 
-    let mut d = BigInt::zero();
+    let mut d: BigInt;
 
     let e = 7.to_bigint().unwrap();
     loop {
@@ -23,8 +23,7 @@ fn main() {
         phi_n = (&p - 1) * (&q - 1);
 
         // (x, y, gcd)
-        let mut extended_euclid_result = (BigInt::zero(), BigInt::zero(), BigInt::zero());
-        extended_euclid_result = extended_euclid(&phi_n, &e);
+        let extended_euclid_result = extended_euclid(&phi_n, &e);
 
         if extended_euclid_result.2 == 1.to_bigint().unwrap() {
             d = extended_euclid_result.1.clone();
@@ -60,7 +59,7 @@ fn main() {
     let decoded_message_as_bytes = decoded_message_as_integer.to_bytes_le().1.to_owned();
     let decoded_message = String::from_utf8_lossy(&decoded_message_as_bytes);
 
-    println!("encoded message: {}", &decoded_message);
+    println!("decoded message: {}", &decoded_message);
     println!("decoded message as integer: {}", decoded_message_as_integer);
 }
 
@@ -73,7 +72,7 @@ fn find_primes(to_find: u32, generator: &mut StdRng) -> Vec<BigInt> {
 }
 
 fn find_prime(generator: &mut StdRng) -> BigInt {
-    let mut candidate = BigInt::zero();
+    let mut candidate: BigInt;
     loop {
         candidate = generator.gen_bigint(256).abs();
         let is_prime = miller_rabin(&candidate, &10);
