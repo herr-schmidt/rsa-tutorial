@@ -1,6 +1,6 @@
 use std::ops::Div;
 
-use num_bigint::{BigUint, RandBigInt, ToBigUint};
+use num_bigint::{BigUint, BigInt, RandBigInt, ToBigUint, ToBigInt};
 use num_traits::Zero;
 
 use std::sync::{Arc, Mutex};
@@ -20,7 +20,7 @@ fn main() {
             if mutex_guard.1 {
                 break;
             }
-            
+
             let candidate = mutex_guard.2.gen_biguint(1024);
             std::mem::drop(mutex_guard);
             let is_prime = miller_rabin(&candidate, &10);
@@ -40,14 +40,16 @@ fn main() {
     }
 
     println!("n: {}", (*result.lock().unwrap()).0);
+
+    let a = 60.to_bigint().unwrap();
+    let b = 13.to_bigint().unwrap();
+    let gcd = extended_euclid(a, b);
+    println!("x: {}", gcd.0);
+    println!("y: {}", gcd.1);
+    println!("gcd: {}", gcd.2);
 }
 
-// fn main() {
-//     let (prime, trials) = find_prime();
-//     println!("key = {}", prime);
-//     println!("trials = {}", trials);
-// }
-
+/*
 fn find_prime() -> (BigUint, u32) {
     let mut rng = rand::thread_rng();
     let bit_size = 2048;
@@ -59,6 +61,7 @@ fn find_prime() -> (BigUint, u32) {
     }
     return (candidate, trials);
 }
+*/
 
 fn miller_rabin(candidate: &BigUint, iterations: &u32) -> bool {
     let mut t = 0;
@@ -104,4 +107,20 @@ fn miller_rabin(candidate: &BigUint, iterations: &u32) -> bool {
         t += 1;
     }
     true // always inconclusive
+}
+
+fn extended_euclid(a: BigInt, b: BigInt) -> (BigInt, BigInt, BigInt){
+    let mut old_r = a.clone();
+    let mut r = b.clone();
+    let mut old_x = 1.to_bigint().unwrap();
+    let mut x = 0.to_bigint().unwrap();
+    let mut old_y = 0.to_bigint().unwrap();
+    let mut y = 1.to_bigint().unwrap();
+    while r != BigInt::zero() {
+        let q = old_r.clone() / r.clone();
+        (old_r, r) = (r.clone(), old_r - &q * r);
+        (old_x, x) = (x.clone(), old_x - &q * x);
+        (old_y, y) = (y.clone(), old_y - &q * y);
+    }
+    return (old_x, old_y, old_r)
 }
